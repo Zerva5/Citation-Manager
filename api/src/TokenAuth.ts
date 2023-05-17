@@ -12,6 +12,9 @@ const REFRESH_SECRET: Secret = "your-refresh-secret"; // Replace this with your 
 
 // Token authentication module!
 export class TokenAuth {
+  public static ACCESS_HEADER = "authorization";
+  public static REFRESH_HEADER = "X-refresh-token";
+
   private static createToken(
     payload: object,
     secret: Secret,
@@ -63,13 +66,18 @@ export class TokenAuth {
   }
 
   public static GetAccessTokenFromRequest(req: Request): string | undefined {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    return token;
+    const authHeader = req.headers[this.ACCESS_HEADER];
+    if (typeof authHeader === "string") {
+      const token = authHeader && authHeader.split(" ")[1];
+
+      return token;
+    } else {
+      return undefined;
+    }
   }
 
   public static GetRefreshTokenFromRequest(req: Request): string | undefined {
-    const authHeader = req.headers["X-refresh-token"];
+    const authHeader = req.headers[this.REFRESH_HEADER];
     // check if authHeader is just a string
     if (typeof authHeader === "string") {
       return authHeader;
@@ -108,7 +116,7 @@ export class TokenAuth {
     this.verifyRefreshToken(token, (err, payload) => {
       if (err) return res.sendStatus(403);
       req.tokenPayload = payload;
-      console.log("Refresh token verified. Payload: " + payload)
+      console.log("Refresh token verified. Payload: " + payload);
       next();
     });
   }
