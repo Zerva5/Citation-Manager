@@ -23,14 +23,21 @@ export function PublicRouting(): express.Router {
       const password = req.body["password"];
       const name = req.body["name"];
 
-      const userAuth = new Auth({ email, password });
-      await userAuth.save();
-
       const user = new User({
         email: req.body["email"],
         name: req.body["name"],
       });
+
+      const userAuth = new Auth({ email, password, user_id: user._id });
+
       await user.save();
+      // If there is some issue saving the user Auth delete the user and throw the error
+      try {
+        await userAuth.save();
+      } catch (err: any) {
+        User.deleteOne({ _id: user._id });
+        throw err;
+      }
 
       res.status(200).send();
     } catch (error: any) {
@@ -49,7 +56,7 @@ export function PublicRouting(): express.Router {
     try {
       const password = req.body["password"];
       const email = req.body["email"];
-      const userAuth = await Auth.findOne({ email });
+      const userAuth = await Auth.findOne({ email: email });
 
       // If user not found, send 400 with message
       if (!userAuth) {
@@ -71,12 +78,11 @@ export function PublicRouting(): express.Router {
 
       // check if there is an issue with the tokens
       if (!accessToken || !refreshToken) {
-
         return res.status(400).send({ message: "Token error" });
       }
 
       // Fetch user info from email
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ _id: userAuth._id });
 
       if (!user) {
         return res.status(400).send({ message: "User not found" });
@@ -92,8 +98,13 @@ export function PublicRouting(): express.Router {
       // res.setHeader(TokenAuth.REFRESH_HEADER, refreshToken);
 
       console.log(res);
-      res.status(200).send({ "accessToken": accessToken, "refreshToken":refreshToken, user: usrObj });
-
+      res
+        .status(200)
+        .send({
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          user: usrObj,
+        });
     } catch (err: any) {
       console.log("Error in /login. " + err.message);
       res.status(400).send(err);
@@ -103,12 +114,23 @@ export function PublicRouting(): express.Router {
   return router;
 }
 
+// Where most of the user endpoints are!
 export function AccessProtectedRouting(): express.Router {
   const router = express.Router();
 
   router.get("/ping", (req: Request, res: Response) => {
     res.send("protected pong");
   });
+
+  router.get("/project", (req: Request, res: Response) =>{
+    res.send("Some project info!")
+  });
+
+  router.get("/citation", (req: Request, res: Response) =>{
+    res.send("Some citation info!")
+  });
+
+
 
   return router;
 }
@@ -133,7 +155,6 @@ export function RefreshProtectedRouting(): express.Router {
 
   return router;
 }
-
 
 /// CHAT GPT EXAMPLE CODE
 // import express, { Request, Response } from "express";
