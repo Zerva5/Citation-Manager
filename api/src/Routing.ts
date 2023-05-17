@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import Auth from "./Auth";
+import Auth from "./UserAuth";
 import jwt, { SignCallback } from "jsonwebtoken";
 import { User } from "./User";
 import { TokenAuth } from "./TokenAuth";

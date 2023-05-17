@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model } from "mongoose";
+import mongoose, { Document, Model, ObjectId, Schema, model } from "mongoose";
 import { IProject } from "./Project";
 import bcrypt from "bcryptjs";
 
@@ -6,12 +6,14 @@ import bcrypt from "bcryptjs";
 export interface IAuth extends Document {
   email: string;
   password: string;
+  user_id: ObjectId;
   comparePassword: (password: string) => Promise<boolean>;
 }
 
 const AuthSchema = new Schema<IAuth>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  user_id: {type: mongoose.Types.ObjectId, required: true}
 });
 
 AuthSchema.pre<IAuth>("save", async function (next) {

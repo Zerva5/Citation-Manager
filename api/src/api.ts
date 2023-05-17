@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import mongoose, { Document, Schema, Model, model, Error } from "mongoose";
 import dotenv from "dotenv";
-import Auth from "./Auth";
+import Auth from "./UserAuth";
 import {PublicRouting, AccessProtectedRouting, RefreshProtectedRouting} from "./Routing";
 import { TokenAuth } from "./TokenAuth";
 
