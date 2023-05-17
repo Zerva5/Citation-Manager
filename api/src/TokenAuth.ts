@@ -19,9 +19,9 @@ export class TokenAuth {
     payload: object,
     secret: Secret,
     options: SignOptions,
-    callback: SignCallback
-  ): void {
-    jwt.sign(payload, secret, options, callback);
+    // callback: SignCallback
+  ): string {
+    return jwt.sign(payload, secret, options).toString();
   }
 
   private static verifyToken(
@@ -35,38 +35,39 @@ export class TokenAuth {
 
   public static createAccessToken(
     userId: string,
-    callback: SignCallback = () => {}
-  ): void {
+    // callback: SignCallback = () => {}
+  ): string {
     const payload = { userId };
     const options: SignOptions = { expiresIn: "1h" }; // Access token valid for 1 hour
-    this.createToken(payload, SECRET_KEY, options, callback);
+    return TokenAuth.createToken(payload, SECRET_KEY, options);
   }
 
   public static createRefreshToken(
     userId: string,
-    callback: SignCallback = () => {}
-  ): void {
+    // callback: SignCallback = () => {}
+  ): string {
     const payload = { userId };
     const options: SignOptions = { expiresIn: "7d" }; // Refresh token valid for 7 days
-    this.createToken(payload, REFRESH_SECRET, options, callback);
+    return TokenAuth.createToken(payload, REFRESH_SECRET, options);
   }
 
   public static verifyAccessToken(
     token: string,
     callback: VerifyCallback
   ): void {
-    this.verifyToken(token, SECRET_KEY, {}, callback);
+    TokenAuth.verifyToken(token, SECRET_KEY, {}, callback);
   }
 
   public static verifyRefreshToken(
     token: string,
     callback: VerifyCallback
   ): void {
-    this.verifyToken(token, REFRESH_SECRET, {}, callback);
+    TokenAuth.verifyToken(token, REFRESH_SECRET, {}, callback);
   }
 
   public static GetAccessTokenFromRequest(req: Request): string | undefined {
-    const authHeader = req.headers[this.ACCESS_HEADER];
+    // const authHeader = req.headers[this.ACCESS_HEADER];
+    const authHeader = req.body['auth'];
     if (typeof authHeader === "string") {
       const token = authHeader && authHeader.split(" ")[1];
 
@@ -77,7 +78,10 @@ export class TokenAuth {
   }
 
   public static GetRefreshTokenFromRequest(req: Request): string | undefined {
-    const authHeader = req.headers[this.REFRESH_HEADER];
+    console.log("HELLO");
+    //const authHeader = req.headers[this.REFRESH_HEADER];
+    const authHeader = req.body['auth'];
+    console.log("auth header: " + authHeader);
     // check if authHeader is just a string
     if (typeof authHeader === "string") {
       return authHeader;
@@ -92,11 +96,11 @@ export class TokenAuth {
     res: Response,
     next: NextFunction
   ) {
-    const token = this.GetAccessTokenFromRequest(req);
+    const token = TokenAuth.GetAccessTokenFromRequest(req);
 
     if (token == null) return res.sendStatus(401);
 
-    this.verifyAccessToken(token, (err, payload) => {
+    TokenAuth.verifyAccessToken(token, (err, payload) => {
       if (err) return res.sendStatus(403);
       req.tokenPayload = payload;
       next();
@@ -109,11 +113,11 @@ export class TokenAuth {
     res: Response,
     next: NextFunction
   ) {
-    const token = this.GetRefreshTokenFromRequest(req);
+    const token = TokenAuth.GetRefreshTokenFromRequest(req);
 
     if (token == null) return res.sendStatus(401);
 
-    this.verifyRefreshToken(token, (err, payload) => {
+    TokenAuth.verifyRefreshToken(token, (err, payload) => {
       if (err) return res.sendStatus(403);
       req.tokenPayload = payload;
       console.log("Refresh token verified. Payload: " + payload);

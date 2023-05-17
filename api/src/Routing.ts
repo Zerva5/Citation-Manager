@@ -65,19 +65,13 @@ export function PublicRouting(): express.Router {
       }
 
       // If passwords match, create a new refresh and access token
-      var accessToken: string | undefined;
-      var refreshToken: string | undefined;
-      TokenAuth.createAccessToken(userAuth._id, (err, token) => {
-        // check if there is an issue with the tokens
-        accessToken = token;
-      });
+      const accessToken = TokenAuth.createAccessToken(userAuth._id);
 
-      TokenAuth.createRefreshToken(userAuth._id, (err, token) => {
-        refreshToken = token;
-      });
+      const refreshToken = TokenAuth.createRefreshToken(userAuth._id);
 
       // check if there is an issue with the tokens
       if (!accessToken || !refreshToken) {
+
         return res.status(400).send({ message: "Token error" });
       }
 
@@ -91,11 +85,15 @@ export function PublicRouting(): express.Router {
       const usrObj = user.toObject();
       // If user not found, there is a problem with the database
       // We won't handle that yet
-      res.setHeader("Authorization", `Bearer ${accessToken}`);
-      res.setHeader("X-Refresh-Token", refreshToken);
 
       // If user found, send 200 with token and user info
-      res.status(200).send({ token, user: usrObj });
+      // Set the response headers with the new token
+      // res.setHeader(TokenAuth.ACCESS_HEADER, `Bearer ${accessToken}`);
+      // res.setHeader(TokenAuth.REFRESH_HEADER, refreshToken);
+
+      console.log(res);
+      res.status(200).send({ "accessToken": accessToken, "refreshToken":refreshToken, user: usrObj });
+
     } catch (err: any) {
       console.log("Error in /login. " + err.message);
       res.status(400).send(err);
@@ -136,11 +134,6 @@ export function RefreshProtectedRouting(): express.Router {
   return router;
 }
 
-export default function GetRouting(): express.Router {
-  const router = express.Router();
-
-  return router;
-}
 
 /// CHAT GPT EXAMPLE CODE
 // import express, { Request, Response } from "express";
