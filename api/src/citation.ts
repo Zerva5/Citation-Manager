@@ -62,8 +62,6 @@ export class ArticleCitation extends Citation {
 
 // Mongoose citation interface, all fields from Website or Article are optional
 export interface ICitation extends Document{
-    _id: number;
-
     cit_type: CitationType;
     title: string;
     authors?: string[];
@@ -85,7 +83,7 @@ export interface ICitation extends Document{
 
 // Mongoose citation schema
 export const CitationSchema = new Schema<ICitation>({
-    _id: { type: Number, required: true },
+    // _id: { type: Number, required: true },
 
     // cit_type: { type: CitationType, required: true },
     cit_type: { type: Number, required: true },
