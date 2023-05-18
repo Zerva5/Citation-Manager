@@ -13,7 +13,7 @@ const REFRESH_SECRET: Secret = "your-refresh-secret"; // Replace this with your 
 // Token authentication module!
 export class TokenAuth {
   public static ACCESS_HEADER = "authorization";
-  public static REFRESH_HEADER = "X-refresh-token";
+  // public static REFRESH_HEADER = "X-refresh-token";
 
   private static createToken(
     payload: object,
@@ -78,7 +78,8 @@ export class TokenAuth {
   }
 
   public static GetRefreshTokenFromRequest(req: Request): string | undefined {
-    console.log("HELLO");
+    // Since the refresh token and access token are never sent by the clinet at the same time we can have them always stored in the Auth header
+    // console.log("HELLO");
     //const authHeader = req.headers[this.REFRESH_HEADER];
     const authHeader = req.body['auth'];
     console.log("auth header: " + authHeader);
