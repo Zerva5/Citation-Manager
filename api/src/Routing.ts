@@ -23,6 +23,8 @@ export function PublicRouting(): express.Router {
       const password = req.body["password"];
       const name = req.body["name"];
 
+      console.log(req.body);
+
       const user = new User({
         email: req.body["email"],
         name: req.body["name"],
@@ -56,7 +58,9 @@ export function PublicRouting(): express.Router {
     try {
       const password = req.body["password"];
       const email = req.body["email"];
-      const userAuth = await Auth.findOne({ email: email });
+      const userAuth = await Auth.findOne({ email: "example@example.com" });
+
+      console.log(userAuth);
 
       // If user not found, send 400 with message
       if (!userAuth) {
@@ -82,7 +86,7 @@ export function PublicRouting(): express.Router {
       }
 
       // Fetch user info from email
-      const user = await User.findOne({ _id: userAuth._id });
+      const user = await User.findOne({ _id: userAuth.user_id });
 
       if (!user) {
         return res.status(400).send({ message: "User not found" });
@@ -97,7 +101,7 @@ export function PublicRouting(): express.Router {
       // res.setHeader(TokenAuth.ACCESS_HEADER, `Bearer ${accessToken}`);
       // res.setHeader(TokenAuth.REFRESH_HEADER, refreshToken);
 
-      console.log(res);
+      // console.log(res);
       res
         .status(200)
         .send({
