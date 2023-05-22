@@ -1,9 +1,9 @@
 import express, { Express, Request, Response } from "express";
 import mongoose, { Document, Schema, Model, model, Error } from "mongoose";
 import dotenv from "dotenv";
-import Auth from "./UserAuth";
 import {PublicRouting, AccessProtectedRouting, RefreshProtectedRouting} from "./Routing";
 import { TokenAuth } from "./TokenAuth";
+import cors from 'cors';
 
 async function connectDB() {
   try {
@@ -24,6 +24,9 @@ function StartExpress(){
   const app: Express = express();
   const port = process.env.PORT;
   app.use(express.json());
+
+  app.use(cors());
+  
 
   const accessProtectedRouting = AccessProtectedRouting();
   const publicRouting = PublicRouting();
