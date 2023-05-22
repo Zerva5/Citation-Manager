@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import Footer from "../Footer";
-import RegisterForm from "../RegisterForm";
-import { BrowserRouter as Router, Route, RouteMatch } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
-import Loading from "../Loading";
 import { User } from "../../DataClasses";
 
 enum LoginErrorType {
